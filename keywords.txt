@@ -1,0 +1,35 @@
+SimpleZigBeeRadio	KEYWORD1
+SimpleZigBeePacket	KEYWORD1
+SimpleIncomingZigBeePacket	KEYWORD1
+SimpleOutgoingZigBeePacket	KEYWORD1
+SimpleZigBeeAddress	KEYWORD1
+SimpleZigBeeAddress64	KEYWORD1
+SimpleZigBeeAddress16	KEYWORD1
+
+read	KEYWORD2
+getFrameType	KEYWORD2
+setFrameType	KEYWORD2
+getFrameID	KEYWORD2
+setFrameID	KEYWORD2
+setNewFrameID	KEYWORD2
+getFrameData	KEYWORD2
+setFrameData	KEYWORD2
+
+setAcknowledge	KEYWORD2
+send	KEYWORD2
+setDestinationAddress	KEYWORD2
+setDestinationAddress64	KEYWORD2
+setDestinationAddress16	KEYWORD2
+setBroadcastRadius	KEYWORD2
+setOption	KEYWORD2
+setPayload	KEYWORD2
+quickTransmitRequestBroadcast	KEYWORD2
+quickTransmitRequestToCoordinator	KEYWORD2
+
+getAddress16	KEYWORD2
+getAddress	KEYWORD2
+getAddress64	KEYWORD2
+getAddressMSB	KEYWORD2
+getAddressLSB	KEYWORD2
+setAddress64	KEYWORD2
+setAddress16	KEYWORD2
