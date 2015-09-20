@@ -96,10 +96,10 @@
     // array's length (number of bytes to store).
     zbp.setFrameData(0, exFrame, sizeof(exFrame));
    
-    // If you are having trouble connecting the router
-    // to the coordinator, you can try sending the
-    // command to leave the current network and then 
-    // wait for the router to reconnect.
+    // If you are having trouble connecting the Router
+    // to the Coordinator, you can try sending the
+    // AT command to leave the current network and then 
+    // wait for the Router to reconnect.
     /*
     Serial.println( "Send command to leave network (CB4)" );
     xbee.prepareATCommand('CB',4);
