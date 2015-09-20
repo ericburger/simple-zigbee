@@ -1,15 +1,15 @@
 /* 
-   Getting Started: Part 1b
-   Router Example 1
+   Getting Started, Part 1: Router 
   
    This example will show you how to setup a router and
    send a packet to the network coordinator using the
    SimpleZigBee library. You will need to complete
-   "Getting Started: Part 1a" before completing this
-   example.
+   "Getting Started, Part 1: Coordinator" before 
+   completing this example.
   
    ###########################################################
    created 30 June 2014
+   updated 16 Sept 2015
    by Eric Burger
    
    This example code is in the public domain.
@@ -17,7 +17,7 @@
    ###########################################################
    
    Setup:
-   1. Complete "Getting Started: Part 1a".
+   1. Complete "Getting Started, Part 1: Coordinator".
    
    2. This code will be used to interact with a router. 
    Use the XCTU Software to load the Router API firmware 
@@ -33,10 +33,10 @@
    Connect DOUT to Pin 10 (RX) and DIN to Pin 11 (TX). Also,
    connect the XBee to 3.3V and ground (GND).
    
-   4. Upload this sketch (to a second Arduino attached to a router)
-   and open the Arduino IDE's Serial Monitor. Read through the
-   commented code below to understand what is being displayed
-   in the serial monitor.
+   4. Upload this sketch (to a second Arduino attached to the
+   Router) and open the Arduino IDE's Serial Monitor. Read 
+   through the commented code below to understand what is
+   being displayed in the serial monitor.
    
    5. If you are having trouble getting the router to connect to
    the coordinator, try reseting both XBees to the default
@@ -71,15 +71,14 @@
   void setup() {
     // Start the serial ports ...
     Serial.begin( 9600 );
-    while( !Serial ){;// Wait for serial port (for Leonardo only). 
-    }
+    while( !Serial ){;}// Wait for serial port (for Leonardo only). 
     xbeeSerial.begin( 9600 );
     // ... and set the serial port for the XBee radio.
     xbee.setSerial( xbeeSerial );
     // Receive TX Status packets
     xbee.setAcknowledgement(true);
     
-    // The "frame" in a ZigBee packet refers to the data between 
+    // The frame data in a ZigBee packet refers to the data between 
     // the length LSB and the checksum. Below is an example of
     // a frame where:
     // Frame type = 0x10 (ZigBee Transmit Request)
@@ -111,7 +110,7 @@
   
   
   void loop() {
-    // If data is waiting in the XBee serial port ...
+    // While data is waiting in the XBee serial port ...
     while( xbee.available() ){
       // ... read the data.
       xbee.read();
@@ -143,7 +142,7 @@
       // object contained in the SimpleZigBeeRadio class.
       xbee.send( zbp );
      
-      val = (val + 1)%65535; // Increase val by 10 (start over at 65535)
+      val = (val + 10)%500; // Increase val by 10 (start over at 500)
     }
     
     delay(10); // Small delay for stability

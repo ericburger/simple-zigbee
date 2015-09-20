@@ -1,16 +1,16 @@
 /* 
-   Getting Started: Part 2b
-   Router Example 2
+   Getting Started, Part 2: Router
   
-   This example will expand upon the Router Example 1 sketch.
-   (Getting Started: Part 1b). Added features include setting the 
-   API Mode and PAN ID from the Arduino and using methods to 
-   change the contents of the outgoing packet. You will need to
-   complete "Getting Started: Part 2a" before completing this
-   example.
+   This example will expand upon the previous Router sketch.
+   (Getting Started, Part 1: Router). Added features include 
+   setting the API Mode and PAN ID from the Arduino and using
+   methods to change the contents of the outgoing packet. You
+   will need to complete "Getting Started, Part 2: Coordinator"
+   before completing this example.
   
    ###########################################################
    created 30 June 2014
+   updated 16 Sept 2015
    by Eric Burger
    
    This example code is in the public domain.
@@ -18,8 +18,8 @@
    ###########################################################
    
    
-   Setup (same as Getting Started: Part 1b):
-   1. Complete "Getting Started: Part 2a".
+   Setup (same as Getting Started, Part 1: Router):
+   1. Complete "Getting Started, Part 2: Coordinator".
    
    2. Use the XCTU Software to load the Router API firmware 
    onto an XBee S2 radio.
@@ -27,10 +27,10 @@
    3. Connect DOUT to Pin 10 (RX) and DIN to Pin 11 (TX). Also,
    connect the XBee to 3.3V and ground (GND).
    
-   4. Upload this sketch (to a second Arduino attached to a router)
-   and open the Arduino IDE's Serial Monitor. Read through the
-   commented code below to understand what is being displayed
-   in the serial monitor.
+   4. Upload this sketch (to a second Arduino attached to the
+   Router) and open the Arduino IDE's Serial Monitor. Read 
+   through the commented code below to understand what is
+   being displayed in the serial monitor.
 
  */
 
@@ -62,7 +62,7 @@
     // To ensure that the radio is in API Mode 2 and is
     // operating on the correct PAN ID, you can use the 
     // AT Commands AP and ID. Note: These changes will
-    // be stored in volitile memory and will not persist
+    // be stored in volatile memory and will not persist
     // if power is lost.
     xbee.prepareATCommand('AP',2);
     xbee.send();
@@ -71,12 +71,12 @@
     xbee.prepareATCommand('ID',panID,sizeof(panID));
     xbee.send();    
     
-    // The changes above can be saved to non-volitile memory 
+    // The changes above can be saved to non-volatile memory 
     // (and will survive power on/off) using the WR command.
     // However, the WR command should be used sparingly! 
     // The EM250 chip inside the XBee only supports a
     // limited number of write cycles.
-    //xbee.prepareATCommand('W','R'); 
+    //xbee.prepareATCommand('WR'); 
     //xbee.send();
     //delay(500);
   }
@@ -109,7 +109,7 @@
       // incoming messages and one for outgoing messages.
       // The SimpleZigBeeRadio class includes several 
       // methods to make it easy to prepare outgoing packets.
-      // For example, prepareTransmitRequestToCoordinator()
+      // For example, prepareTXRequestToCoordinator()
       // will accept a payload and payload length and will 
       // set the frame type, frame ID, option, and address.
       xbee.prepareTXRequestToCoordinator( payload, 2 );
@@ -131,7 +131,7 @@
       xbee.send(); 
       Serial.print("\nSend: ");
       printPacket( xbee.getOutgoingPacketObject() );
-      val = (val + 1)%65535; // Increase val by 10 (start over at 65535)
+      val = (val + 10)%500; // Increase val by 10 (start over at 500)
     }
     
     delay(10); // Small delay for stability

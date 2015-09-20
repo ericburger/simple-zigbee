@@ -1,10 +1,9 @@
 /* 
-   Getting Started: Part 2a
-   Coordinator Example 2
+   Getting Started, Part 2: Coordinator
   
-   This example will expand upon the Coordinator Example 1 sketch
-   (Getting Started: Part 1a). Added features include setting the 
-   API Mode and PAN ID from the Arduino and identifying
+   This example will expand upon the previous Coordinator sketch
+   (Getting Started, Part 1: Coordinator). Added features include
+   setting the API Mode and PAN ID from the Arduino and identifying
    incoming packet types.
    
    Again, you will need two XBee S2 radios (one with
@@ -13,25 +12,26 @@
    
    ###########################################################
    created 30 June 2014
+   updated 16 Sept 2015
    by Eric Burger
    
    This example code is in the public domain.
    The SimpleZigBee library is released under the GNU GPL v2 License
    ###########################################################
    
-   Setup (same as Getting Started: Part 1a): 
+   Setup (same as Getting Started, Part 1: Coordinator): 
    1. Use the XCTU Software to load the Coordinator API firmware 
    onto an XBee S2 radio.
    
    2. Connect DOUT to Pin 10 (RX) and DIN to Pin 11 (TX). Also,
    connect the XBee to 3.3V and ground (GND).
    
-   3. Upload this sketch (to the Arduino attached to the coordinator)
-   and open the Arduino IDE's Serial Monitor. Read through the
-   commented code below to understand what is being displayed
-   in the serial monitor.
+   3. Upload this sketch (to the Arduino attached to the 
+   Coordinator) and open the Arduino IDE's Serial Monitor. 
+   Read through the commented code below to understand what
+   is being displayed in the serial monitor.
    
-   4. Complete "Getting Started: Part 2b".
+   4. Complete "Getting Started, Part 2: Router".
 
  */
 
@@ -50,8 +50,7 @@
   void setup() {
     // Start the serial ports ...
     Serial.begin( 9600 );
-    while( !Serial ){;// Wait for serial port (for Leonardo only). 
-    }
+    while( !Serial ){;} // Wait for serial port (for Leonardo only).
     xbeeSerial.begin( 9600 );
     // ... and set the serial port for the XBee radio.
     xbee.setSerial( xbeeSerial );
@@ -61,25 +60,24 @@
     // To ensure that the radio is in API Mode 2 and is
     // operating on the correct PAN ID, you can use the 
     // AT Commands AP and ID. Note: These changes will
-    // be stored in volitile memory and will not persist
+    // be stored in volatile memory and will not persist
     // if power is lost.
-    xbee.prepareATCommand('AP',2);
+    xbee.prepareATCommand('AP',0x02);
     xbee.send();
     delay(200);
     uint8_t panID[] = {0x12,0x34}; // Max: 64-bit
     xbee.prepareATCommand('ID',panID,sizeof(panID));
-    xbee.send();    
+    xbee.send();
     
-    // The changes above can be saved to non-volitile memory 
+    // The changes above can be saved to non-volatile memory 
     // (and will survive power on/off) using the WR command.
     // However, the WR command should be used sparingly! 
     // The EM250 chip inside the XBee only supports a
     // limited number of write cycles.
-    //xbee.prepareATCommand('W','R'); 
+    //xbee.prepareATCommand('WR'); 
     //xbee.send();
     //delay(500);
   }
-  
   
   void loop() {    
     // If data is waiting in the XBee serial port ...
@@ -97,7 +95,7 @@
         Serial.print("\nIncoming Message: ");
         printPacket( xbee.getIncomingPacketObject() );
         
-        // Check the packet type. Currenlty, the only types
+        // Check the frame type. Currently, the only types
         // recognized by the SimpleZigBeeRadio class are 
         // ZigBee RX Packet (0x90), ZigBee TX Status (0x8b),
         // AT Command Response (0x88), Remote AT Command
@@ -123,9 +121,9 @@
           // Methods for TX Status packets are...
           uint8_t frameID = xbee.getIncomingFrameID();
           SimpleZigBeeAddress16 addr16 = xbee.getTXStatusAddress16(); 
-  	  uint8_t txRetry = xbee.getTXStatusRetryCount();
-  	  uint8_t txStat = xbee.getTXStatusDeliveryStatus();
-  	  uint8_t txDscovery = xbee.getTXStatusDiscoveryStatus();
+          uint8_t txRetry = xbee.getTXStatusRetryCount();
+          uint8_t txStat = xbee.getTXStatusDeliveryStatus();
+          uint8_t txDscovery = xbee.getTXStatusDiscoveryStatus();
           Serial.print( "Status: " );
           Serial.println(txStat,HEX);
           
@@ -136,14 +134,21 @@
           uint16_t atCmd = xbee.getATResponseCommand();
           uint8_t atStat = xbee.getATResponseStatus();
           uint8_t atLength = xbee.getATResponsePayloadLength();
-          if( atLength == 1 ){
-            uint8_t atData = xbee.getATResponsePayload();
-          }else if( atLength > 1 ){
-            int index = 1;
-	    uint8_t atData = xbee.getATResponsePayload(index);
-          }
           Serial.print( "Status: " );
           Serial.println(atStat,HEX);
+          if( atLength == 1 ){
+            uint8_t atData = xbee.getATResponsePayload();
+            Serial.print( "Payload: " );
+            Serial.println(atData,HEX);
+          }else if( atLength > 1 ){
+            Serial.print( "Payload: " );
+            for(int i=0;i<atLength;i++){
+              uint8_t atData = xbee.getATResponsePayload(i);
+              Serial.print(atData,HEX);
+              Serial.print(' ');
+            }
+            Serial.println();
+          }
           
         }else if( xbee.isRemoteATResponse() ){
           Serial.println( "Remote AT Command Response Received" );
@@ -152,17 +157,24 @@
           SimpleZigBeeAddress64 addr64 = xbee.getRemoteATResponseAddress64(); 
           SimpleZigBeeAddress16 addr16 = xbee.getRemoteATResponseAddress16();  
           uint8_t frameID = xbee.getIncomingFrameID();
-          uint16_t reatCmd = xbee.getRemoteATResponseCommand();
-          uint8_t reatStat = xbee.getRemoteATResponseStatus();
-          uint8_t reatLength = xbee.getRemoteATResponsePayloadLength();
-          if( reatLength == 1 ){
-            uint8_t reatData = xbee.getRemoteATResponsePayload();
-          }else if( reatLength > 1 ){
-            int index = 1;
-	    uint8_t reatData = xbee.getRemoteATResponsePayload(index);
-          }
+          uint16_t reATCmd = xbee.getRemoteATResponseCommand();
+          uint8_t reATStat = xbee.getRemoteATResponseStatus();
+          uint8_t reATLength = xbee.getRemoteATResponsePayloadLength();
           Serial.print( "Status: " );
-          Serial.println(reatStat,HEX);
+          Serial.println(reATStat,HEX);
+          if( reATLength == 1 ){
+            uint8_t reATData = xbee.getRemoteATResponsePayload();
+            Serial.print( "Payload: " );
+            Serial.println(reATData,HEX);
+          }else if( reATLength > 1 ){
+            Serial.print( "Payload: " );
+            for(int i=0;i<reATLength;i++){
+              uint8_t reATData = xbee.getRemoteATResponsePayload(i);
+              Serial.print(reATData,HEX);
+              Serial.print(' ');
+            }
+            Serial.println();
+          }
           
         }else if( xbee.isModemStatus() ){
           Serial.println( "Modem Status Received" );
@@ -173,7 +185,13 @@
           
         }else{
           // Other or unimplemented frame type
-          Serial.println( "Other Frame Type" );
+          SimpleZigBeePacket p = xbee.getIncomingPacketObject();
+          uint8_t frameType = p.getFrameData(0);
+          Serial.print( "Other Frame Type: " );
+          Serial.println(frameType,HEX);
+          for( int i=1; i<p.getFrameLength(); i++ ){
+            uint8_t frameData = p.getFrameData(i);
+          }
         }
       }
     }
@@ -182,7 +200,7 @@
     
     
     // Since changes were made to the radio's settings,
-    // below are a fews checks to verify that the changes
+    // below are a few checks to verify that the changes
     // were applied.
     if( check < 2 ){
       if( check == 0 ){

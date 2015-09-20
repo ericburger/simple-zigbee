@@ -1,6 +1,5 @@
 /* 
-   Getting Started: Part 1a
-   Coordinator Example 1
+   Getting Started, Part 1: Coordinator
   
    Welcome to the SimpleZigBee library. This library
    is intented to make it easy to setup a network of 
@@ -27,6 +26,7 @@
   
    ###########################################################
    created 30 June 2014
+   updated 16 Sept 2015
    by Eric Burger
    
    This example code is in the public domain.
@@ -48,13 +48,12 @@
    Connect DOUT to Pin 10 (RX) and DIN to Pin 11 (TX). Also,
    connect the XBee to 3.3V and ground (GND).
    
-   3. Upload this sketch (to the Arduino attached to the coordinator)
-   and open the Arduino IDE's Serial Monitor. Read through the
-   commented code below to understand what is being displayed
-   in the serial monitor (though very little will occur until you
-   complete "Getting Started: Part 1b").
+   3. Upload this sketch (to the Arduino attached to the 
+   Coordinator) and open the Arduino IDE's Serial Monitor. 
+   Read through the commented code below to understand what
+   is being displayed in the serial monitor.
    
-   4. Complete "Getting Started: Part 1b".
+   4. Complete "Getting Started, Part 1: Router".
 
  */
 
@@ -67,29 +66,27 @@
   // SoftwareSerial object can receive data at a time.
   SoftwareSerial xbeeSerial(10, 11); // (RX=>DOUT, TX=>DIN)
 
-
   void setup() {
     // Start the serial ports ...
     Serial.begin( 9600 );
-    while( !Serial ){;// Wait for serial port (for Leonardo only). 
-    }
+    while( !Serial ){;}  // Wait for serial port (for Leonardo only). 
     xbeeSerial.begin( 9600 );
     // ... and set the serial port for the XBee radio.
     xbee.setSerial( xbeeSerial );
-    // Set a non-zero frame id to receive Status and Response packets.
+    // Set a non-zero frame id to receive Status packets.
     xbee.setAcknowledgement(true); 
   }
   
   void loop() {
-    // Each SimpleZigBeeRadio object contains two 
-    // SimpleZigBeePacket objects, one for storing incoming
+    // Each SimpleZigBeeRadio instance contains two 
+    // SimpleZigBeePacket instances, one for storing incoming
     // messages and one for preparing outgoing messages.
     // This example will not send any messages to the network.
     // Rather, the coordinator will receive messages and display
     // the contents to the hardware serial port.
     
-    // If data is waiting in the XBee serial port ...
-    if( xbee.available() ){
+    // While data is waiting in the XBee serial port ...
+    while( xbee.available() ){
       // ... read the data.
       xbee.read();
       // If a complete message is available, display the contents
@@ -107,7 +104,7 @@
     }
     // Note: Because the .isComplete() check is inside the 
     // .available() loop, an incoming message will never 
-    // pass the .isComplete() check more than one. The next
+    // pass the .isComplete() check more than once. The next
     // time the .available() loop is entered (i.e. a new message
     // arrives), the previous incoming message will be erased.
       
