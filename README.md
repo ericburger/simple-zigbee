@@ -6,4 +6,4 @@ SimpleZigBee is an easy-to-use Arduino library for communicating with XBee Serie
 A 3 part tutorial for getting started with the SimpleZigBee can be found at <a href="http://wallfloweropen.com/">WallflowerOpen.com</a>.
 * <a href="http://wallfloweropen.com/?project=getting-started-with-simplezigbee-for-arduino-xbee-part-1">Getting Started with SimpleZigBee for Arduino & XBee: Part 1</a>
 * <a href="http://wallfloweropen.com/?project=getting-started-with-simplezigbee-for-arduino-xbee-part-2">Getting Started with SimpleZigBee for Arduino & XBee: Part 2</a>
-* * <a href="http://wallfloweropen.com/?project=getting-started-with-simplezigbee-for-arduino-xbee-part-3">Getting Started with SimpleZigBee for Arduino & XBee: Part 3</a>
+* <a href="http://wallfloweropen.com/?project=getting-started-with-simplezigbee-for-arduino-xbee-part-3">Getting Started with SimpleZigBee for Arduino & XBee: Part 3</a>
