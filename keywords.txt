@@ -6,30 +6,114 @@ SimpleZigBeeAddress	KEYWORD1
 SimpleZigBeeAddress64	KEYWORD1
 SimpleZigBeeAddress16	KEYWORD1
 
+
+reset	KEYWORD2
+resetIncoming	KEYWORD2
+resetOutgoing	KEYWORD2
+setSerial	KEYWORD2
+
+getIncomingPacketObject	KEYWORD2
+getOutgoingPacketObject	KEYWORD2
+
+available	KEYWORD2
 read	KEYWORD2
+isEscaping	KEYWORD2
+setEscaping	KEYWORD2
+isComplete	KEYWORD2
+setComplete	KEYWORD2
+
+getIncomingFrameType	KEYWORD2
+getIncomingFrameID	KEYWORD2
+getIncomingFrameData	KEYWORD2
+
+isRX	KEYWORD2
+isTXStatus	KEYWORD2
+isATResponse	KEYWORD2
+isRemoteATResponse	KEYWORD2
+isModemStatus	KEYWORD2
+
+setOutgoingFrameType	KEYWORD2
+setOutgoingFrameID	KEYWORD2
+getLastFrameID	KEYWORD2
+saveLastFrameID	KEYWORD2
+setNextFrameID	KEYWORD2
+setAcknowledge	KEYWORD2
+setOutgoingFrameData	KEYWORD2
+
+setOutgoingAddress	KEYWORD2
+setOutgoingAddress64	KEYWORD2
+setOutgoingAddress16	KEYWORD2
+
+send	KEYWORD2
+sendPacket	KEYWORD2
+
+prepareTXRequest	KEYWORD2
+prepareTXRequestBroadcast	KEYWORD2
+prepareTXRequestToCoordinator	KEYWORD2
+prepareATCommand	KEYWORD2
+prepareRemoteATCommand	KEYWORD2
+
 getFrameType	KEYWORD2
 setFrameType	KEYWORD2
 getFrameID	KEYWORD2
 setFrameID	KEYWORD2
-setNewFrameID	KEYWORD2
+getMaxFrameLength	KEYWORD2
 getFrameData	KEYWORD2
 setFrameData	KEYWORD2
 
-setAcknowledge	KEYWORD2
-send	KEYWORD2
-setDestinationAddress	KEYWORD2
-setDestinationAddress64	KEYWORD2
-setDestinationAddress16	KEYWORD2
-setBroadcastRadius	KEYWORD2
-setOption	KEYWORD2
-setPayload	KEYWORD2
-quickTransmitRequestBroadcast	KEYWORD2
-quickTransmitRequestToCoordinator	KEYWORD2
-
-getAddress16	KEYWORD2
 getAddress	KEYWORD2
 getAddress64	KEYWORD2
+getAddress16	KEYWORD2
 getAddressMSB	KEYWORD2
 getAddressLSB	KEYWORD2
+setAddress	KEYWORD2
 setAddress64	KEYWORD2
 setAddress16	KEYWORD2
+
+
+getChecksum	KEYWORD2
+calculateChecksum	KEYWORD2
+setChecksum	KEYWORD2
+
+isError	KEYWORD2
+getErrorCode	KEYWORD2
+setErrorCode	KEYWORD2
+
+getRXAddress	KEYWORD2
+getRXAddress64	KEYWORD2
+getRXAddress16	KEYWORD2
+getRXOptions	KEYWORD2
+getRXPayloadLength	KEYWORD2
+getRXPayload	KEYWORD2
+
+getTXStatusAddress16	KEYWORD2
+getTXStatusRetryCount	KEYWORD2
+getTXStatusDeliveryStatus	KEYWORD2
+getTXStatusDiscoveryStatus	KEYWORD2
+
+getATResponseCommand	KEYWORD2
+getATResponseStatus	KEYWORD2
+getATResponsePayloadLength	KEYWORD2
+getATResponsePayload	KEYWORD2
+
+getRemoteATResponseAddress	KEYWORD2
+getRemoteATResponseAddress64	KEYWORD2
+getRemoteATResponseAddress16	KEYWORD2
+getRemoteATResponseCommand	KEYWORD2
+getRemoteATResponseStatus	KEYWORD2
+getRemoteATResponsePayloadLength	KEYWORD2
+getRemoteATResponsePayload	KEYWORD2
+
+getModemStatus	KEYWORD2
+
+
+setTXRequestBroadcastRadius	KEYWORD2
+setTXRequestOption	KEYWORD2
+setTXRequestPayload	KEYWORD2
+
+setATCommand	KEYWORD2
+setATCommandPayload	KEYWORD2
+
+setRemoteATCommandOption	KEYWORD2
+setRemoteATCommand	KEYWORD2
+setRemoteATCommandPayload	KEYWORD2

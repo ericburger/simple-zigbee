@@ -1,9 +1,9 @@
 /**
  * Library Name: SimpleZigBeeAddress
- * Library URI: 
+ * Library URI: https://github.com/ericburger/simple-zigbee
  * Description: Classes for managing ZigBee addresses
  * by the connected radio. 
- * Version: 0.1.0
+ * Version: 0.1.1
  * Author(s): Eric Burger
  * Author URI: WallflowerOpen.com
  * License: GNU General Public License v2.0 or later

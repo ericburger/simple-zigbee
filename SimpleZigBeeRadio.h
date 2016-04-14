@@ -1,12 +1,12 @@
 /**
 * Library Name: SimpleZigBeeRadio
-* Library URI: 
+* Library URI: https://github.com/ericburger/simple-zigbee
 * Description: Library for sending and receiving packets through the Arduino Serial port
 * using the ZigBee protocol. Intended for use with XBee S2 radios. These radios can
 * be connected directly to the Arduino's TX and RX pins or to any two digital pins 
 * using the SoftwareSerial Arduino library. For more details about this library and 
-* examples of its use, please visit......
-* Version: 0.1.0
+* examples of its use, please visit https://github.com/ericburger/simple-zigbee.
+* Version: 0.1.1
 * Author(s): Eric Burger
 * Author URI: WallflowerOpen.com
 * License: GNU General Public License v2.0 or later

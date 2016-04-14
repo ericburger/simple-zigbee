@@ -80,24 +80,24 @@ void SimpleZigBeeRadio::resetOutgoing(){
 /**
 *  Method: setSerial(HardwareSerial & serial)
 *  @ Since v0.1.0 by Eric Burger, September 2013
+*  @ Updated v0.1.1 by Eric Burger, April 2016
 *  @ Set the pointer to the HardwareSerial object communicating with the XBee radio
 *  @ param HardwareSerial& serial: Pointer to HardwareSerial object.
 */
 void SimpleZigBeeRadio::setSerial(HardwareSerial & serial){
 	_serial = &serial;
-	_is_software_serial = false;
 }
 
 /**
 *  Method: setSerial(Stream & serial)
 *  @ Since v0.1.0 by Eric Burger, September 2013
-*  @ Set the pointer to the Stream object communicating with the XBee radio. 
-*  @ Compatible with SoftwareSerial but not with flush() method.
+*  @ Updated v0.1.1 by Eric Burger, April 2016
+*  @ For SoftwareSerial port, set the pointer to the Stream object 
+*    communicating with the XBee radio.
 *  @ param Stream& serial: Pointer to Stream object.
 */
 void SimpleZigBeeRadio::setSerial(Stream & serial){
 	_serial = &serial;
-	_is_software_serial = true;
 }
 
 /*//////////////////////////////////////////////////////////////////////
@@ -862,20 +862,13 @@ void SimpleZigBeeRadio::write(uint8_t byte){
 /**
 *  Method: flush()
 *  @ Since v0.1.0 by Eric Burger, September 2013
+*  @ Updated v0.1.1 by Eric Burger, April 2016
 *  @ Flush serial port (wait until all outgoing bytes have been sent)
 */
 void SimpleZigBeeRadio::flush(){
-	if( _is_software_serial ){
-		// July 2014: With SoftwareSerial, flush() clears incoming buffer  
-		// (same as pre Arduino 1.0 HardwareSerial flush()). Disable this method
-		// until this is fixed/changed. Apply a short delay instead.
-		// Reference: http://forum.arduino.cc/index.php?topic=87651.0;wap2
-		delay(50);
-	}else{
-		// For HardwareSerial, use flush()
-		_serial->flush();
-	}
-
+	// For HardwareSerial, this will wait until TX buffer is clear
+	// For SoftwareSerial, there is no TX buffer and so this simply returns
+	_serial->flush();
 }
 
 /*//////////////////////////////////////////////////////////////////////
