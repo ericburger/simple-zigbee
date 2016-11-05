@@ -45,7 +45,8 @@
   unsigned long time = 0;
   unsigned long last_sent = 0;
   int sum = 0;
-      int check = 0;
+  int check = 0;
+  
   void setup() {
     // Start the serial ports ...
     Serial.begin( 9600 );
