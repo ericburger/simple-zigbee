@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>SimpleZigBee Part 1</title>
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    
+    <link rel="stylesheet" id="style-css" href="css/style.css" type="text/css" media="all">
+    <link rel="stylesheet" id="prism-css" href="css/prism.css" type="text/css" media="all">
+    <link rel="stylesheet" id="tocible-css" href="css/jquery.tocible.css" type="text/css" media="all">
+    
+    <script type="text/javascript" src="js/jquery.js"></script>
+    
+</head>
+
+<body>    
+    <div class="container" id="content">
+    
+        <nav class="navbar navbar-default">  
+          <div class="container-fluid"> <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-6" aria-expanded="false">
+              <span class="sr-only">Toggle navigation</span> 
+              <span class="icon-bar"></span> 
+              <span class="icon-bar"></span> 
+              <span class="icon-bar"></span> 
+            </button> 
+            
+            <a class="navbar-brand" href="https://github.com/ericburger/simple-zigbee">SimpleZigBee</a> </div>
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-6"> 
+              <ul class="nav navbar-nav"> 
+                <li class="active"><a href="getting-started-part-1.html">Getting Started: Part 1</a></li>
+                <li><a href="getting-started-part-2.html">Getting Started: Part 2</a></li>
+                <li><a href="getting-started-part-3.html">Getting Started: Part 3</a></li>
+              </ul> 
+            </div> 
+          </div> 
+        </nav>
+        
+
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h1>Getting Started with SimpleZigBee<br>for Arduino &amp; XBee</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2" style="position:relative">
+                <div class="reference" style="visibility: hidden;"></div>
+            </div>
+            <div class="col-md-8 col-md-offset-0" id="main-column">
+                <p><a href="https://github.com/ericburger/simple-zigbee" target="_blank">SimpleZigBee</a> is an easy-to-use Arduino library for communicating with <a href="http://www.digi.com/lp/xbee/" target="_blank">XBee Series 2 and 2B ZigBee</a> radios. The library implements the most popular XBee API frame types (TX, RX, AT Command, etc.) and makes it easy to add a wireless communication network to your Arduino project. This 3 part tutorial covers the basics of using the library to send and receive messages.
+                </p>
+                
+                <p><img class="img-responsive" src="css/images/XBee_ZigBee_S2_SimpleSigBee_1.jpg" alt="Arduinos with XBee"></p>
+                
+                <p>If you are looking to learn about ZigBee, wireless networks, or serial communication in general, I highly recommend the book <a href="https://www.sparkfun.com/products/10324" target="_blank">Building Wireless Sensor Networks</a> by Robert Faludi. This book is how I first learned about the ZigBee wireless networking protocol, serial communication with hexadecimals, and how to use XBee radios to create distributed sensor systems. Consequently, you may find that the SimpleZigBee library is  complementary to Faludi's book. Once you understand the basics of working with an XBee and the ZigBee protocol, the SimpleZigBee library will make it easy to implement your project.</p>
+                
+                <h2>Getting Started: Part 1</h2>
+
+                <p>In this tutorial, you will need <a href="https://www.sparkfun.com/products/11021" target="_blank">2 Arduinos</a>, <a href="https://www.sparkfun.com/products/11217" target="_blank">2 XBee S2 radios</a>, and <a href="https://www.sparkfun.com/products/11373" target="_blank">2 XBee Explorer boards</a>. You will also need <a href="https://www.sparkfun.com/products/11812" target="_blank">1 XBee USB Explorer board</a> for updating the firmware and changing the settings of each XBee. Lastly, you can download the <a href="https://github.com/ericburger/simple-zigbee" target="_blank">SimpleZigBee</a> library from GitHub and add the library to you Arduino IDE (Sketch->Include Library->Add .ZIP Library).</p>
+
+                <p>In this example, we will program 2 XBee radios using the X-CTU software, which can be downloaded for free from <a href="http://www.digi.com/products/xbee-rf-solutions/xctu-software/xctu" target="_blank">Digi</a>. One XBee will be the network coordinator and the other, a network router.  Then, we will connect each XBee to an Arduino and upload the Getting Started, Part 1 sketches. Once complete, the Arduino with the Router will send a message (containing an integer value in the payload) to the Coordinator once every 5 seconds and the Arduino with the Coordinator will print the message to the hardware serial port, allowing us to view the contents using the Arduino IDE Serial Monitor.</p>
+
+                <h2>Upload the XBee Firmware</h2>
+
+                <p>Using the X-CTU software and XBee USB Explorer, upload the correct firmware to each XBee. One XBee should have Coordinator API firmware and the other, Router API firmware. For both radios, either leave the PAN ID setting as 0 (and a PAN ID will automatically be set) or choose a simple PAN ID (like 1, 100, or 2020) . Both XBees must have the same PAN ID. Lastly, for both radios, make sure the API Mode is set to 2 (AP=2). This is a requirement of the SimpleZigBee library.</p>
+
+                <h2>Coordinator Setup</h2>
+
+                <p>Select the Arduino that will be connected to the XBee Coordinator. In this example, the Arduino will connect to the XBee using a Software Serial port. This allows the Hardware Serial port to remain free, making it easier to reprogram the Arduino and to debug the code. Begin by connecting the XBee. Connect DOUT to Pin 10 (RX) and DIN to Pin 11 (TX), as shown below. Also, connect the XBee to 5V and ground (GND).</p>
+
+                <p><img class="img-responsive" src="css/images/Arduinos-with-XBee.jpg" alt="Arduinos with XBee"></p>
+                
+                <p>Next, upload the example sketch GettingStarted_Part1_Coordinator.ino to the Arduino and open the Arduino IDE's Serial Monitor. Read through the commented code to understand what is being displayed in the serial monitor (though very little will occur until you complete the Router setup below).</p>
+
+                <h2>Router Setup</h2>
+
+                <p>Connect the second Arduino to the XBee Router, as done in Part 1. Again, the Arduino will connect to the XBee using a Software Serial port. Next, upload the example sketch GettingStarted_Part1_Router.ino to the Arduino and open the Arduino IDE's Serial Monitor. As soon as the sketch is uploaded, the XBees should begin communicating. Read through the commented code to understand what is being displayed in the serial monitor.  When a packet is successfully sent from one XBee to another, the RSSI LED on the XBee Explorer board will turn on for a second or so (depending on the signal strength). If you are having trouble getting the Router to connect to the Coordinator, you can try sending the command to leave the current network and then wait for the Router to reconnect (uncomment last 4 lines of setup function).</p>
+
+                <h2>Coordinator Code Walkthrough</h2>
+
+                <p>In this section, we will walk through the GettingStarted_Part1_Coordinator.ino example code and explain the role of the SimpleZigBee library. To begin, take a look at the top of the sketch.</p>
+
+                <pre><code class="language-processing">#include &lt;SimpleZigBeeRadio.h&gt;
+#include &lt;SoftwareSerial.h&gt;
+// Create the XBee object ...
+SimpleZigBeeRadio xbee = SimpleZigBeeRadio();
+// ... and the software serial port. Note: Only one
+// SoftwareSerial object can receive data at a time.
+SoftwareSerial xbeeSerial(10, 11); // (RX=>DOUT, TX=>DIN)
+</code></pre>
+
+                <p>The SimpleZigBee library actually includes 3 separate libraries: SimpleZigBeeRadio, SimpleZigBeePacket, and SimpleZigBeeAddress. By including the SimpleZigBeeRadio library in the sketch, the SimpleZigBeePacket and SimpleZigBeeAddress libraries are automatically added as well. The <b>xbee</b> object is an instance of the SimpleZigBeeRadio class.  Every instance of SimpleZigBeeRadio includes, as object parameters, two instances of the SimpleZigBeePacket class, one for storing the last incoming message and one for preparing an outgoing message. This makes it very easy to respond to the last sender with a minimal amount of code. Lastly, as stated above, we are communicating with the XBee via a software serial port using digital pins 10 and 11.</p>
+
+                <p>Next, we will take a look at the <b>setup</b> function.</p>
+
+                <pre><code class="language-processing">void setup() {
+    // Start the serial ports ...
+    Serial.begin( 9600 );
+    while( !Serial ){;}  // Wait for serial port (for Leonardo only).
+    xbeeSerial.begin( 9600 );
+    // ... and set the serial port for the XBee radio.
+    xbee.setSerial( xbeeSerial );
+    // Set a non-zero frame id to receive Status and Response packets.
+    xbee.setAcknowledgement(true);
+}
+</code></pre>
+
+                <p>In the <b>setup</b> function, we call the <b>begin</b> method for the hardware serial port object, <b>Serial</b>, and the software serial port object, <b>xbeeSerial</b>. Next, we tell the <b>xbee</b> object which serial port the XBee radio is connected to by calling the <b>setSerial</b> method and passing in the <b>xbeeSerial</b> object. If the XBee radio was connected to digital pins 0 and 1, we would pass in the <b>Serial</b> object instead. Lastly, we call the <b>setAchnowledgement</b> method and pass in true. This tells the <b>xbee</b> object to use non-zero frame ids when sending out messages, which will in turn tell the receiving XBee radio to send Status packets to acknowledge the successful reception of a message. If we pass in false, the <b>xbee</b> object will set the frame id of every outgoing message to 0 and thus no Status packets will be sent back.</p>
+
+                <p>Now take a look at the <b>loop</b> function.</p>
+
+                <pre><code class="language-processing">void loop() {
+    // If data is waiting in the XBee serial port ...
+    if( xbee.available() ){
+        // ... read the data.
+        xbee.read();
+        // If a complete message is available, display the contents
+        if( xbee.isComplete() ){
+            Serial.print("\nIncoming Message: ");
+            printPacket( xbee.getIncomingPacketObject() );
+        }
+    }
+    delay(10); // Small delay for stability
+}
+</code></pre>
+
+                <p>The <b>available</b> method checks the buffer of the serial port (in this case, <b>xbeeSerial</b>) and returns the number of incoming bytes. The <b>read</b> method reads the bytes from the serial port and stores them in the <b>xbee</b> object's incoming packet object. As the <b>xbee</b> object reads the incoming message, it will automatically determine if the message has been completely received. This can be checked using the <b>isComplete</b> method. Note that because the <b>isComplete</b> if statement is within the available while loop, an incoming message will never be printed more than once. After a message has been completely received and printed, we will only reenter the <b>available</b> while loop when another message arrives. In this case, the previous message will be erased to make room for the new message. Lastly, while the SimpleZigBeeRadio class includes methods for getting the contents of the incoming packet object, in this example we call the <b>getIncomingPacketObject</b> method to retrieve the object directly.</p>
+
+                <p>Finally, we will look at the printPacket function.</p>
+
+                <pre><code class="language-processing">void printPacket(SimpleZigBeePacket &amp; p){
+    Serial.print( START, HEX );
+    Serial.print(' ');
+    Serial.print( p.getLengthMSB(), HEX );
+    Serial.print(' ');
+    Serial.print( p.getLengthLSB(), HEX );
+    Serial.print(' ');
+    // Frame Type and Frame ID are stored in Frame Data
+    uint8_t checksum = 0;
+    for( int i=0; i &lt; p.getFrameLength(); i++){
+        Serial.print( p.getFrameData(i), HEX );
+        Serial.print(' ');
+        checksum += p.getFrameData(i);
+    }
+    // Calculate checksum based on summation of frame bytes
+    checksum = 0xff - checksum;
+    Serial.print(checksum, HEX );
+    Serial.println();
+}
+</code></pre>
+
+                <p>The <b>printPacket</b> function prints the contents of an SimpleZigBeePacket instance as a hexadecimal string. The <b>getLengthMSB</b> and <b>getLengthLSB</b> methods retrieve the most and least significant bytes, respectively, of the packet's length. The frame data consists of the bytes between the packet length LSB and the packet checksum. The <b>getFrameLength</b> method retrieves the number of frame data bytes and <b>getFrameData</b>, the specific byte. The checksum is the final byte in a packet and is used to verify that a message is complete. The checksum is calculated as shown in the <b>printPacket</b> function.</p>
+
+                <h2>Router Code Walkthrough</h2>
+
+                <p>In this section, we will walk through the GettingStarted_Part1_Router.ino example code and explain the role of the SimpleZigBee library. In the example, the Arduino with the Router sends an integer value to the Arduino with the Coordinator once every 5 seconds. To begin, take a look at the top of the sketch.</p>
+
+                <pre><code class="language-processing">#include &lt;SimpleZigBeeRadio.h&gt;
+#include &lt;SoftwareSerial.h&gt;
+// Create the XBee object ...
+SimpleZigBeeRadio xbee = SimpleZigBeeRadio();
+// ... and the software serial port. Note: Only one
+// SoftwareSerial object can receive data at a time.
+SoftwareSerial xbeeSerial(10, 11); // (RX=>DOUT, TX=>DIN)
+// Packet to send: In this example, we will update
+// the contents of a packet before sending it.
+SimpleZigBeePacket zbp = SimpleZigBeePacket();
+
+// Value and payload to be sent
+int val = 0;
+// Variables to store time
+unsigned long time = 0;
+unsigned long last_sent = 0;
+</code></pre>
+
+                <p>As before, we begin by including the SimpleZigBeeRadio and SoftwareSerial libraries and then creating the xbee and xbeeSerial objects. In this example, rather than using the packet object within the xbee object to send a message, we will create the zbp object, an instance of the SimpleZigBeePacket class.  We will update the contents of zbp somewhat manually before sending the packet. Next, we have an integer, val, which will serve as the payload of each outgoing message, and 2 longs, time and last_sent, to help us send a message once every 5 seconds.</p>
+
+                <p>Next, we will look at the setup function.</p>
+                
+                <pre><code class="language-processing">void setup() {
+    // Start the serial ports ...
+    Serial.begin( 9600 );
+    while( !Serial ){;}// Wait for serial port (for Leonardo only).
+    xbeeSerial.begin( 9600 );
+    // ... and set the serial port for the XBee radio.
+    xbee.setSerial( xbeeSerial );
+    // Receive TX Status packets
+    xbee.setAcknowledgement(true);
+    // The frame data in a ZigBee packet refers to the data between
+    // the length LSB and the checksum. 
+    uint8_t exFrame[] = { 0x10,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xff,0xfe,0x00,0x00,0xff,0xff };
+    // Now store the example frame in the packet object.
+    zbp.setFrameData(0, exFrame, sizeof(exFrame));
+}
+</code></pre>
+                
+                <p>As before, we begin the serial ports, set the xbee serial port as xbeeSerial, and set xbee to request acknowledgement of outgoing packets. Next, we define a byte array containing the frame data of a ZigBee packet. Note, the frame data in a ZigBee packet refers to the bytes between the length LSB and the checksum. By calling setFrameData, we use the array to populate the contents of the zbp packet object starting at index 0 of the frame data. As specified by the array, the frame data includes:</p>
+                <ul>
+                    <li>Frame type: 0x10 (ZigBee Transmit Request)</li>
+                    <li>Frame id: 0x01</li>
+                    <li>64-bit destination address: 0x0000000000000000 (Coordinator address)</li>
+                    <li>16-bit destination address: 0xfffe (unknown or broadcast)</li>
+                    <li>Broadcast radius: 0x00 (unlimited hops)</li>
+                    <li>Options = 0x00 (default)</li>
+                    <li>Payload data = 0xff, 0xff (2 payload bytes)</li>
+                </ul>
+                
+                <p>If you are having trouble getting the Router to connect to the Coordinator, you can uncomment the following lines of code in the <b>setup</b> function. The Arduino will then send the AT command to leave the current network ( CB4) and wait 1 seconds for the Router to reconnect.</p>
+                
+                <pre><code class="language-processing">Serial.println( "Send command to leave network (CB4)" );
+xbee.prepareATCommand('CB',4);
+xbee.send();
+delay(10000);
+</code></pre>
+                
+                <p>Next, we will look at the <b>loop</b> function.</p>
+                
+                <pre><code class="language-processing">void loop() {
+    // While data is waiting in the XBee serial port ...
+    while( xbee.available() ){
+        // ... read the data.
+        xbee.read();
+        // If a complete message is available and it
+        // has not been read yet, read it.
+        if( xbee.isComplete() ){
+            // Print the contents of the incoming packet
+            Serial.print("\nIncoming Message: ");
+            printPacket( xbee.getIncomingPacketObject() );
+        }
+    }
+    // The Arduino will send a packet to the XBee once every 5 seconds.
+    time = millis();
+    if( time &gt; (last_sent+5000) ){
+        last_sent = time; // Update the last_sent variable
+        // Update the payload (in this case, the last 2 bytes of the frame)
+        // The rest of the frame (address, etc) does not need to be changed.
+        zbp.setFrameData( zbp.getFrameLength()-2, val &gt;&gt; 8 &amp; 0xff );
+        zbp.setFrameData( zbp.getFrameLength()-1, val &amp; 0xff );
+        Serial.print("\nSend Message: ");
+        printPacket( zbp );
+        // Send the packet. This example does not use the outgoing packet
+        // object contained in the SimpleZigBeeRadio class.
+        xbee.send( zbp );
+        val = (val + 10)%500; // Increase val by 10 (start over at 500)
+    }
+    delay(10); // Small delay for stability
+    // That's it! The router is ready to go.
+}
+</code></pre>
+                
+                <p>The <b>loop</b> function begins with code to read and print any incoming messages, just as with the Arduino with the Coordinator. Below this, we have code to send the ZigBee packet contained in <b>zbp</b> once every 5 seconds (5000 milliseconds). Before sending the packet, we update the payload (in this example, the last 2 bytes of the frame data). Because, in Arduino, an integer contains 2 bytes, we must break the integer <b>val</b> into 2 bytes using the bitshift left (>>)  and bitwise and (&) operators and store the bytes in the the <b>zbp</b> object using <b>setFrameData</b>. Finally, we display the packet using <b>printPacket</b>, send the packet from the Arduino to the XBee using <b>send</b>, and update the val integer.</p>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+    <script type="text/javascript" src="js/prism.js"></script>
+    <script type="text/javascript" src="js/jquery.tocible.min.js"></script>
+
+    <script type="text/javascript">
+    <!--//--><![CDATA[//><!--		// Use self invoking function expression
+    (function() {// Wait for window to load. Them start plugin.
+        var eburgerLoadingFunction = function(method){
+            if( window.jQuery ){
+                jQuery.ready( method() );
+            }
+        }
+        eburgerLoadingFunction(function(){
+            if( window.jQuery ){
+                /*jQuery('#content #main-column').css({'margin-right':'+=150'});
+                off = jQuery('#content').offset();*/
+                ref = jQuery('<div/>', {
+                        class: 'reference',
+                        css: { position: 'absolute', right: 180, top: 0 },
+                });
+                //jQuery('#content').css({position: 'relative'});
+                jQuery('#content').tocible({
+                        heading: '#main-column h2', //[selector], the first level heading
+                        subheading: '#main-column h3', //[selector], the second level heading
+                        reference:'.reference', //[selector], reference element for horizontal positioning
+                        title: 'Contents', //[selector or string], title of the menu
+                        hash: false, //[boolean], setting true will enable URL hashing on click
+                        offsetTop: 100, //[number], spacing/margin above the menu
+                        speed: 800, //[number or string ('slow' & 'fast')], duration of the animation when jumping to the clicked content
+                        collapsible: true, //[boolean], enabling true will auto collapse sub level heading not being scrolled into
+                        maxWidth: 180 //[number], set max-width of the navigation menu
+                });
+            }
+        });
+    })();//--><!]]&gt; </script>
+
+</body>
+
+</html>

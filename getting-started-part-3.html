@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>SimpleZigBee Part 1</title>
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    
+    <link rel="stylesheet" id="style-css" href="css/style.css" type="text/css" media="all">
+    <link rel="stylesheet" id="prism-css" href="css/prism.css" type="text/css" media="all">
+    <link rel="stylesheet" id="tocible-css" href="css/jquery.tocible.css" type="text/css" media="all">
+    
+    <script type="text/javascript" src="js/jquery.js"></script>
+    
+</head>
+
+<body>    
+    <div class="container" id="content">
+    
+        <nav class="navbar navbar-default">  
+          <div class="container-fluid"> <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-6" aria-expanded="false">
+              <span class="sr-only">Toggle navigation</span> 
+              <span class="icon-bar"></span> 
+              <span class="icon-bar"></span> 
+              <span class="icon-bar"></span> 
+            </button> 
+            
+            <a class="navbar-brand" href="https://github.com/ericburger/simple-zigbee">SimpleZigBee</a> </div>
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-6"> 
+              <ul class="nav navbar-nav"> 
+                <li><a href="getting-started-part-1.html">Getting Started: Part 1</a></li>
+                <li><a href="getting-started-part-2.html">Getting Started: Part 2</a></li>
+                <li class="active"><a href="getting-started-part-3.html">Getting Started: Part 3</a></li>
+              </ul> 
+            </div> 
+          </div> 
+        </nav>
+        
+
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h1>Getting Started with SimpleZigBee<br>for Arduino &amp; XBee</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2" style="position:relative">
+                <div class="reference" style="visibility: hidden;"></div>
+            </div>
+            <div class="col-md-8 col-md-offset-0" id="main-column">
+                <p><a href="https://github.com/ericburger/simple-zigbee" target="_blank">SimpleZigBee</a> is an easy-to-use Arduino library for communicating with <a href="http://www.digi.com/lp/xbee/" target="_blank">XBee Series 2 and 2B ZigBee</a> radios. The library implements the most popular XBee API frame types (TX, RX, AT Command, etc.) and makes it easy to add a wireless communication network to your Arduino project. This 3 part tutorial covers the basics of using the library to send and receive messages.
+                </p>
+                
+                <p><img class="img-responsive" src="css/images/XBee_ZigBee_S2_SimpleSigBee_3.jpg" alt="Arduinos with XBee"></p>
+                
+                <h2>Getting Started: Part 3</h2>
+                
+                <p>This tutorial is a continuation of Getting Started with SimpleZigBee for Arduino &amp; XBee: Part 2. You will need to complete Part 2 before starting Part 3. In this tutorial, you will again need <a href="https://www.sparkfun.com/products/11021" target="_blank">2 Arduinos</a>, <a href="https://www.sparkfun.com/products/11217" target="_blank">2 XBee S2 radios</a>, and <a href="https://www.sparkfun.com/products/11373" target="_blank">2 XBee Explorer boards</a>. One XBee should have Coordinator API firmware and the other, Router API firmware. In this example, it does not matter if the XBees have the same PAN ID or if they are in API Mode 2 because we will change these settings by sending AT Commands from the Arduino to the XBee.</p>
+                
+                <p>To setup the Coordinator, connect the XBee (with Coordinator API firmware) to your Arduino, as shown below. Upload the example sketch GettingStarted_Part3_Coordinator.ino to the Arduino and open the Arduino IDE’s Serial Monitor. Read through the code to understand what is being displayed in the serial monitor (though very little will occur until you complete the Router setup below).</p>
+                
+                <p>To setup the Router, connect the XBee (with Router API firmware) to your second Arduino, as shown above. Upload the example sketch GettingStarted_Part3_Router.ino to the Arduino and open the Arduino IDE’s Serial Monitor. Read through the code to understand what is being displayed in the serial monitor.</p>
+
+                <p><img class="img-responsive" src="css/images/Arduinos-with-XBee.jpg" alt="Arduinos with XBee"></p>
+                
+                <h2>Coordinator Code Walkthrough</h2>
+
+                <p>In this section, we will walk through the GettingStarted_Part3_Coordinator.ino example code and explain the role of the SimpleZigBee library. Much of the code is identical to that from GettingStarted_Part2_Coordinator.ino and so we will focus on the new or modified lines of code. To begin, take a look at the following lines from the <b>loop</b> function.</p>
+                
+<pre><code class="language-processing">if( xbee.isRX() ){
+    Serial.println( "RX Packet Received" );
+    Serial.print( "Sum: " );
+    int sum = 0;
+    for(int i=0;i&lt;xbee.getRXPayloadLength();i++){
+        sum = sum + xbee.getRXPayload(i);
+        if(i!=0){
+            Serial.print( " + " );
+        }
+        Serial.print(xbee.getRXPayload(i));
+    }
+    Serial.print( " = " );
+    Serial.println( sum );
+    // The sum is an int and must therefore be broken
+    // into 2 bytes and set as the payload.
+    uint8_t payload[2]; // ints are 2 bytes
+    payload[0] = sum &gt;&gt; 8 &amp; 0xff;
+    payload[1] = sum &amp; 0xff;
+    // Prepare a TX Packet with the address of the sender.
+    xbee.prepareTXRequest(xbee.getRXAddress(),payload,2);
+    xbee.send();
+    Serial.print( "Send: " );
+    printPacket( xbee.getOutgoingPacketObject() );
+}
+</code></pre>
+                
+                <p>In the code snippet, the Arduino checks if the incoming packet has the ZigBee RX frame type (0x90). If so, the Arduino sums the bytes in the payload. The contents of the payload are retrieved, one byte at a time, using the <b>getRXPayload</b>(i) method where i is the index within the payload. Next, the Arduino sends the sum back to the sender (in this case, the Router XBee). Because an Arduino int is 2 bytes, we need a payload byte array of length 2. We employ the <b>prepareTXRequest</b> method, which sets the TX frame type (0x10), frame id, and option (0x00). Additionally, the <b>prepareTXRequest</b> method accepts the 64-bit and 16-bit destination addresses (retrieved using <b>getRXAddress</b>), a payload (byte array), and payload length as input parameters.</p>
+                
+                <h2>Router Code Walkthrough</h2>
+                
+                <p>In this section, we will walk through the GettingStarted_Part3_Router.ino example code and explain the role of the SimpleZigBee library. Much of the code is identical to that from GettingStarted_Part2_Router.ino and so we will focus on the new or modified lines of code. To begin, take a look at the following lines from the <b>loop</b> function.</p>
+
+<pre><code class="language-processing">if( xbee.isRX() ){
+    Serial.println( "RX Packet Received" );
+    if( xbee.getRXPayloadLength() == 2 ){
+        int payloadVal = (xbee.getRXPayload(0) << 8) + xbee.getRXPayload(1);
+        Serial.print( "Received Sum: " );
+        Serial.println( payloadVal );
+        Serial.print( "Stored Sum: " );
+        Serial.println( sum );
+    }
+}
+</code></pre>
+
+                <p>In the code snippet, the Arduino checks if the incoming packet has the ZigBee RX frame type (0x90) and if the payload has a length of 2. If so, The Arduino combines the 2 bytes into an int, representing the sum of the numbers that were previously sent to the Coordinator. Finally, the Arduino prints both the stored and received sums to verify that the values match.</p>
+                
+                <p>This concludes the 3 part Getting Started with SimpleZigBee for Arduino &amp; XBee tutorial. I hope you found it helpful!</p>
+                
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+    <script type="text/javascript" src="js/prism.js"></script>
+    <script type="text/javascript" src="js/jquery.tocible.min.js"></script>
+
+    <script type="text/javascript">
+    <!--//--><![CDATA[//><!--		// Use self invoking function expression
+    (function() {// Wait for window to load. Them start plugin.
+        var eburgerLoadingFunction = function(method){
+            if( window.jQuery ){
+                jQuery.ready( method() );
+            }
+        }
+        eburgerLoadingFunction(function(){
+            if( window.jQuery ){
+                /*jQuery('#content #main-column').css({'margin-right':'+=150'});
+                off = jQuery('#content').offset();*/
+                ref = jQuery('<div/>', {
+                        class: 'reference',
+                        css: { position: 'absolute', right: 180, top: 0 },
+                });
+                //jQuery('#content').css({position: 'relative'});
+                jQuery('#content').tocible({
+                        heading: '#main-column h2', //[selector], the first level heading
+                        subheading: '#main-column h3', //[selector], the second level heading
+                        reference:'.reference', //[selector], reference element for horizontal positioning
+                        title: 'Contents', //[selector or string], title of the menu
+                        hash: false, //[boolean], setting true will enable URL hashing on click
+                        offsetTop: 100, //[number], spacing/margin above the menu
+                        speed: 800, //[number or string ('slow' & 'fast')], duration of the animation when jumping to the clicked content
+                        collapsible: true, //[boolean], enabling true will auto collapse sub level heading not being scrolled into
+                        maxWidth: 180 //[number], set max-width of the navigation menu
+                });
+            }
+        });
+    })();//--><!]]&gt; </script>
+
+</body>
+
+</html>

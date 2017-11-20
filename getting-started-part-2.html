@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>SimpleZigBee Part 1</title>
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    
+    <link rel="stylesheet" id="style-css" href="css/style.css" type="text/css" media="all">
+    <link rel="stylesheet" id="prism-css" href="css/prism.css" type="text/css" media="all">
+    <link rel="stylesheet" id="tocible-css" href="css/jquery.tocible.css" type="text/css" media="all">
+    
+    <script type="text/javascript" src="js/jquery.js"></script>
+    
+</head>
+
+<body>    
+    <div class="container" id="content">
+    
+        <nav class="navbar navbar-default">  
+          <div class="container-fluid"> <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-6" aria-expanded="false">
+              <span class="sr-only">Toggle navigation</span> 
+              <span class="icon-bar"></span> 
+              <span class="icon-bar"></span> 
+              <span class="icon-bar"></span> 
+            </button> 
+            
+            <a class="navbar-brand" href="https://github.com/ericburger/simple-zigbee">SimpleZigBee</a> </div>
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-6"> 
+              <ul class="nav navbar-nav"> 
+                <li><a href="getting-started-part-1.html">Getting Started: Part 1</a></li>
+                <li class="active"><a href="getting-started-part-2.html">Getting Started: Part 2</a></li>
+                <li><a href="getting-started-part-3.html">Getting Started: Part 3</a></li>
+              </ul> 
+            </div> 
+          </div> 
+        </nav>
+        
+
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h1>Getting Started with SimpleZigBee<br>for Arduino &amp; XBee</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2" style="position:relative">
+                <div class="reference" style="visibility: hidden;"></div>
+            </div>
+            <div class="col-md-8 col-md-offset-0" id="main-column">
+                <p><a href="https://github.com/ericburger/simple-zigbee" target="_blank">SimpleZigBee</a> is an easy-to-use Arduino library for communicating with <a href="http://www.digi.com/lp/xbee/" target="_blank">XBee Series 2 and 2B ZigBee</a> radios. The library implements the most popular XBee API frame types (TX, RX, AT Command, etc.) and makes it easy to add a wireless communication network to your Arduino project. This 3 part tutorial covers the basics of using the library to send and receive messages.
+                </p>
+                
+                <p><img class="img-responsive" src="css/images/XBee_ZigBee_S2_SimpleSigBee_2.jpg" alt="Arduinos with XBee"></p>
+                
+                                <h2>Getting Started: Part 2</h2>
+
+                <p>This tutorial is a continuation <b>Getting Started with SimpleZigBee for Arduino &amp; XBee: Part 1</b>. You will need to complete Part 1 before starting Part 2. In this tutorial, you will again need <a href="https://www.sparkfun.com/products/11021" target="_blank">2 Arduinos</a>, <a href="https://www.sparkfun.com/products/11217" target="_blank">2 XBee S2 radios</a>, and <a href="https://www.sparkfun.com/products/11373" target="_blank">2 XBee Explorer boards</a>.&nbsp;One XBee should have Coordinator API firmware and the other, Router API firmware. In this example, it does not matter if the XBees have the same PAN ID or if they are in API Mode 2 because we will change these settings by sending AT Commands from the Arduino to the XBee.</p>
+
+                <p>To setup the Coordinator, connect the XBee (with Coordinator API firmware) to your Arduino, as shown below. Upload the example sketch GettingStarted_Part2_Coordinator.ino to the Arduino and open the Arduino IDE’s Serial Monitor. Read through the code to understand what is being displayed in the serial monitor (though very little will occur until you complete the Router setup below).</p>
+                
+                <p>To setup the Router, connect the XBee (with Router API firmware) to your second Arduino, as shown below. Upload the example sketch GettingStarted_Part2_Router.ino to the Arduino and open the Arduino IDE’s Serial Monitor. Read through the code to understand what is being displayed in the serial monitor.</p>
+
+                <p><img class="img-responsive" src="css/images/Arduinos-with-XBee.jpg" alt="Arduinos with XBee"></p>
+
+                <h2>Coordinator Code Walkthrough</h2>
+
+                <p>In this section, we will walk through the GettingStarted_Part2_Coordinator.ino example code and explain the role of the SimpleZigBee library. Much of the code is identical to that from GettingStarted_Part1_Coordinator.ino and so we will focus on the new or modified lines of code. To begin, take a look at the following lines from the <b>setup</b> function.</p>
+
+                <pre><code class="language-processing">// Set the API Mode and PAN ID
+xbee.prepareATCommand('AP',0x02);
+xbee.send();
+delay(200);
+uint8_t panID[] = {0x12,0x34}; // Max: 64-bit
+xbee.prepareATCommand('ID',panID,sizeof(panID));
+xbee.send();
+</code></pre>
+                <p>The <b>prepareATCommand</b> method clears the contents of the outgoing packet object and then sets the frame id and frame type (AT Command, 0x08). Based on what is passed to the method, the packet length, AT Command (e.g. AP), and optional AT Command payload is also set. Once the outgoing packet is complete, calling the <b>send</b> method will write the packet to the XBee serial port. In the code above, we have examples of sending an AT Command with a 1 byte payload (to set the API Mode to 0x02) and with a payload greater than 1 byte (to set the PAN ID to 0x1234).</p>
+                
+                <p>Note that when you send an AT Command, the changes are stored in volatile memory and will not persist if power is lost. You can save the changes to non-volatile memory (and they will survive power on/off) using the WR command. However, the WR command should be used sparingly! The EM250 chip inside the XBee only supports a limited number of write cycles.</p>
+                
+                <p>Next, we will take a look at the <b>loop</b> function. Specifically, we have added code to extract the information from an incoming ZigBee packet for each of the (currently implemented) frame types. We will begin with the ZigBee Receive (RX) frame type (0x90).</p>
+
+<pre><code class="language-processing">if( xbee.isRX() ){
+    Serial.println( "RX Packet Received" );
+    // Methods for RX packets are...
+    SimpleZigBeeAddress addr = xbee.getRXAddress();
+    SimpleZigBeeAddress64 addr64 = xbee.getRXAddress64();
+    SimpleZigBeeAddress16 addr16 = xbee.getRXAddress16();
+    uint8_t rxOpt = xbee.getRXOptions();
+    uint8_t rxLength = xbee.getRXPayloadLength();
+    Serial.print( "Payload: " );
+    for(int i=0;i&lt;rxLength;i++){
+        uint8_t rxData = xbee.getRXPayload( i );
+        Serial.print(rxData,HEX);
+        Serial.print(' ');
+    }
+    Serial.println();
+}
+</code></pre>
+
+                <p>The <b>isRX</b> method checks if the complete incoming ZigBee packet has the RX (0x90) frame type. If so, we know that the packet includes the 64-bit and 16-bit addresses of the sender, an options byte, and a payload of bytes. The payload can be accessed, one byte at a time, using the <b>getRXPayload</b>(i) method where i is the index of the byte within the payload.</p>
+                
+                <p>Next, we will look at the Transmit (TX) Status frame type (0x8b).</p>
+
+<pre><code class="language-processing">else if( xbee.isTXStatus() ){
+    Serial.print( "TX Status Received: " );
+    // Methods for TX Status packets are...
+    uint8_t frameID = xbee.getIncomingFrameID();
+    SimpleZigBeeAddress16 addr16 = xbee.getTXStatusAddress16();
+    uint8_t txRetry = xbee.getTXStatusRetryCount();
+    uint8_t txStat = xbee.getTXStatusDeliveryStatus();
+    uint8_t txDscovery = xbee.getTXStatusDiscoveryStatus();
+    Serial.print( "Status: " );
+    Serial.println(txStat,HEX);
+}
+</code></pre>
+
+                <p>The TX Status frame type (0x8b) is used for confirming the transmission of a Transmit (TX) ZigBee packet and contains a status report on any discovery, transmission, or delivery issues. The TX Status packet includes the frame id of the TX packet being reported, the 16-bit destination address, the number of retries that occurred, the delivery status (0x00=Success), and the discovery status.</p>
+                
+                <p>Next, the AT Command Response frame type (0x88).</p>
+                
+<pre><code class="language-processing">else if( xbee.isATResponse() ){
+    Serial.println( "AT Command Response Received" );
+    // Methods for AT Command Response packets are...
+    uint8_t frameID = xbee.getIncomingFrameID();
+    uint16_t atCmd = xbee.getATResponseCommand();
+    uint8_t atStat = xbee.getATResponseStatus();
+    uint8_t atLength = xbee.getATResponsePayloadLength();
+    Serial.print( "Status: " );
+    Serial.println(atStat,HEX);
+    if( atLength == 1 ){
+        uint8_t atData = xbee.getATResponsePayload();
+        Serial.print( "Payload: " );
+        Serial.println(atData,HEX);
+    }else if( atLength &gt; 1 ){
+        Serial.print( "Payload: " );
+        for(int i=0;i&lt;atLength;i++){
+            uint8_t atData = xbee.getATResponsePayload(i);
+            Serial.print(atData,HEX);
+            Serial.print(' ');
+        }
+        Serial.println();
+    }
+}
+</code></pre>
+                
+                <p>If an AT Command packet is sent to the XBee (and the frame id is &gt; 0), an AT Command Response packet (0x88) will be returned. The response contains the frame id of the AT Command packet being reported, the 2 byte AT command, and the command status. Finally, if the AT Command requested register data from the XBee, this is contained in the payload.</p>
+                
+<pre><code class="language-processing">else if( xbee.isRemoteATResponse() ){
+    Serial.println( "Remote AT Command Response Received" );
+    // Methods for Remote AT Command Response packets are...
+    SimpleZigBeeAddress addr = xbee.getRemoteATResponseAddress();
+    SimpleZigBeeAddress64 addr64 = xbee.getRemoteATResponseAddress64();
+    SimpleZigBeeAddress16 addr16 = xbee.getRemoteATResponseAddress16();
+    uint8_t frameID = xbee.getIncomingFrameID();
+    uint16_t reATCmd = xbee.getRemoteATResponseCommand();
+    uint8_t reATStat = xbee.getRemoteATResponseStatus();
+    uint8_t reATLength = xbee.getRemoteATResponsePayloadLength();
+    Serial.print( "Status: " );
+    Serial.println(reATStat,HEX);
+    if( reATLength == 1 ){
+        uint8_t reATData = xbee.getRemoteATResponsePayload();
+        Serial.print( "Payload: " );
+        Serial.println(reATData,HEX);
+    }else if( reATLength &gt; 1 ){
+        Serial.print( "Payload: " );
+        for(int i=0;i&lt;reATLength;i++){
+            uint8_t reATData = xbee.getRemoteATResponsePayload(i);
+            Serial.print(reATData,HEX);
+            Serial.print(' ');
+       }
+       Serial.println();
+    }
+}
+</code></pre>
+                
+                <p>The Remote AT Command Status frame type (0x97) is nearly identical to the AT Command Status frame type(0x88) except that it contains the 64-bit and 16-bit addresses of the XBee radio to which the Remote AT Command was sent.</p>
+                
+<pre><code class="language-processing">else if( xbee.isModemStatus() ){
+    Serial.println( "Modem Status Received" );
+    // Methods for Modem Status packets are...
+    uint8_t modemStat = xbee.getModemStatus();
+    Serial.print( "Status: " );
+    Serial.println(modemStat,HEX);
+}
+</code></pre>
+                
+                <p>Lastly, we have the Modem Status frame type (0x8a), which is automatically sent from the XBee in response to specific events. For example, a status of 2 means the XBee (router or end device) joined a network and 6 means the XBee coordinator started.</p>
+                
+                <p>Modem Status is the last of the status or response frame types currently implemented in the SimpleZigBee library. You can easily add support for other frame types by getting the incoming packet object and parsing the frame data, as shown in the following code.</p>
+                
+                
+<pre><code class="language-processing">else{
+    // Other or unimplemented frame type
+    SimpleZigBeePacket p = xbee.getIncomingPacketObject();
+    uint8_t frameType = p.getFrameData(0);
+    Serial.print( "Other Frame Type: " );
+    Serial.println(frameType,HEX);
+    for( int i=1; i&lt;p.getFrameLength(); i++ ){
+        uint8_t frameData = p.getFrameData(i);
+    }
+}
+</code></pre>
+
+                <p>Near the end of the <b>loop</b> function, you will find the following code.</p>
+                
+<pre><code class="language-processing">if( check &lt; 2 ){
+    if( check == 0 ){
+        xbee.prepareATCommand('AP');
+        xbee.send();
+        Serial.println();
+        Serial.print("Send: ");
+        printPacket( xbee.getOutgoingPacketObject() );
+    }else if( check == 1){
+        xbee.prepareATCommand('ID');
+        xbee.send();
+        Serial.println();
+        Serial.print("Send: ");
+        printPacket( xbee.getOutgoingPacketObject() );
+    }
+    check ++;
+    delay(200);
+}
+</code></pre>
+
+                <p>Since we changed the XBee’s settings in the <b>setup</b> function, we want to check the register to verify that the changes were made. The code snippet above sends 2 AT Commands (AP and ID) to the XBee. The AT Command Response packets will contain the API Mode and the PAN ID of the XBee, as recorded in the register.</p>
+                
+                
+                <h2>Router Code Walkthrough</h2>
+                <p>In this section, we will walk through the GettingStarted_Part2_Router.ino example code and explain the role of the SimpleZigBee library. Much of the code is identical to that in GettingStarted_Part2_Coordinator.ino and GettingStarted_Part1_Router.ino and so we will focus on the new or modified lines of code. To begin, take a look at the following lines from the <b>loop</b> function.</p>
+                
+<pre><code class="language-processing">// The Arduino will send a packet to the XBee once every 5 seconds.
+time = millis();
+if( time &gt; (last_sent+5000) ){
+    last_sent = time; // Update the last_sent variable
+    payload[0] = val &gt;&gt; 8 &amp; 0xff;
+    payload[1] = val &amp; 0xff;
+    // The prepareTXRequestToCoordinator method
+    // will accept a payload and payload length and will
+    // set the frame type, frame ID, option, and address.
+    xbee.prepareTXRequestToCoordinator( payload, 2 );
+    xbee.send();
+    Serial.print("\nSend: ");
+    printPacket( xbee.getOutgoingPacketObject() );
+    val = (val + 10)%500; // Increase val by 10 (start over at 500)
+}
+</code></pre>
+                
+                <p>With the code above, the Router XBee sends a ZigBee Transmit Request (TX) packet with a payload to the Coordinator XBee once every 5 seconds. We employ the<b>prepareTXRequestToCoordinator</b> method, which sets the TX frame type (0x10), frame id, and option (0x00). The method also sets the default 64-bit and 16-bit addresses for sending a packet to the network coordinator (0x0000000000000000 for coordinator and 0xfffe for unknown/broadcast). Lastly, the <b>prepareTXRequestToCoordinator</b> method accepts a payload (byte array) and payload length as input parameters.</p>
+                
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+    <script type="text/javascript" src="js/prism.js"></script>
+    <script type="text/javascript" src="js/jquery.tocible.min.js"></script>
+
+    <script type="text/javascript">
+    <!--//--><![CDATA[//><!--		// Use self invoking function expression
+    (function() {// Wait for window to load. Them start plugin.
+        var eburgerLoadingFunction = function(method){
+            if( window.jQuery ){
+                jQuery.ready( method() );
+            }
+        }
+        eburgerLoadingFunction(function(){
+            if( window.jQuery ){
+                /*jQuery('#content #main-column').css({'margin-right':'+=150'});
+                off = jQuery('#content').offset();*/
+                ref = jQuery('<div/>', {
+                        class: 'reference',
+                        css: { position: 'absolute', right: 180, top: 0 },
+                });
+                //jQuery('#content').css({position: 'relative'});
+                jQuery('#content').tocible({
+                        heading: '#main-column h2', //[selector], the first level heading
+                        subheading: '#main-column h3', //[selector], the second level heading
+                        reference:'.reference', //[selector], reference element for horizontal positioning
+                        title: 'Contents', //[selector or string], title of the menu
+                        hash: false, //[boolean], setting true will enable URL hashing on click
+                        offsetTop: 100, //[number], spacing/margin above the menu
+                        speed: 800, //[number or string ('slow' & 'fast')], duration of the animation when jumping to the clicked content
+                        collapsible: true, //[boolean], enabling true will auto collapse sub level heading not being scrolled into
+                        maxWidth: 180 //[number], set max-width of the navigation menu
+                });
+            }
+        });
+    })();//--><!]]&gt; </script>
+
+</body>
+
+</html>
